@@ -33,8 +33,6 @@ const SocketServer = (server) => {
 
             const chatters = await getChatters(user.id)// query
 
-            console.log(chatters)
-
             // notify his friends that user is now online
             for (let i = 0; i < chatters.length; i++) {
                 if (users.has(chatters[i])) {
@@ -61,18 +59,11 @@ const SocketServer = (server) => {
         })
 
         socket.on('message', async (message) => {
-            console.log(`received message ${message}`)
-            console.log(message)
             let sockets = []
-            console.log(`users.has(message.fromUser.id)=${users.has(message.fromUser.id)}`)
             if (users.has(message.fromUser.id)) {
                 sockets = users.get(message.fromUser.id).sockets
             }
-            console.log(`message.toUserId=${message.toUserId}`)
-            console.log(message.toUserId)
             message.toUserId.forEach(id => {
-                console.log(`id = ${id}`)
-                console.log(`users.has(id)=${users.has(id)}`)
                 if (users.has(id)) {
                     sockets = [...sockets, ...users.get(id).sockets]
                 }
@@ -93,19 +84,9 @@ const SocketServer = (server) => {
                 message.id = savedMessage.id
                 message.message = savedMessage.message
                 delete message.fromUser
-                // console.log("\n\n\n")
-                // console.log(savedMessage)
-                // console.log("\n\n\n")
-                // console.log(message)
-                console.log("sockets:")
-                console.log(sockets)
                 sockets.forEach(sock => {
-                    console.log("sending message back to frontend")
-                    console.log(sock)
                     io.to(sock).emit('received', message)
                 })
-
-                console.log("finish finish")
             } catch (e) {
 
             }
